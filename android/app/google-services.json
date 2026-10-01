@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "623468431015",
+    "project_id": "advmobileprog-firebase2627",
+    "storage_bucket": "advmobileprog-firebase2627.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623468431015:android:56387acffe786354d4bd82",
+        "android_client_info": {
+          "package_name": "com.example.navarro_advmobprog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnyVw59R9OjmI0iDPtPjFpcdO_6AVItSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

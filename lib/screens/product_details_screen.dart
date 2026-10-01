@@ -2,13 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/product.dart';
+import '../services/cart_service.dart';
+import '../services/user_services.dart';
 import '../widgets/custom_text.dart';
 
 //details page, uses future builder
-class ProductDetailsScreen extends StatelessWidget {
+class ProductDetailsScreen extends StatefulWidget {
   final Product product;
 
   const ProductDetailsScreen({super.key, required this.product});
+
+  @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  final CartService _cartService = CartService();
+  bool _addingToCart = false;
+
+  Product get product => widget.product;
+
+  Future<void> _addToCart() async {
+    setState(() => _addingToCart = true);
+    try {
+      // Lab 4 - Enhancement 3: adds to the signed-in user's cart instead of
+      // a hardcoded userId.
+      final userId = await UserService().getCurrentUserId();
+      await _cartService.addToCart(userId, [
+        {'id': product.id, 'quantity': 1},
+      ]);
+      bumpCartQuantity(product.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${product.title} added to cart')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to add to cart')),
+      );
+    } finally {
+      if (mounted) setState(() => _addingToCart = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,12 +121,23 @@ class ProductDetailsScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
-                      child: const CustomText(
-                        text: 'Read All',
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
                       ),
+                      onPressed: _addingToCart ? null : _addToCart,
+                      child: _addingToCart
+                          ? SizedBox(
+                              width: 18.w,
+                              height: 18.w,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const CustomText(
+                              text: 'Add to Cart',
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                     ),
                   ),
                 ],

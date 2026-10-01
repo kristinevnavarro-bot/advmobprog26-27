@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/product.dart';
-import '../services/product_services.dart';
+import '../services/cart_service.dart';
+import '../services/product_service.dart';
+import '../services/user_services.dart';
 import '../widgets/custom_text.dart';
 import 'product_details_screen.dart';
 
@@ -15,6 +18,7 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   final ProductService _productService = ProductService();
+  final CartService _cartService = CartService();
   final TextEditingController _searchController = TextEditingController();
 
   List<Product> _allProducts = [];
@@ -39,9 +43,16 @@ class _ProductScreenState extends State<ProductScreen> {
   Future<void> _loadProducts() async {
     try {
       final products = await _productService.getAllProducts();
+      // Lab 4 - Enhancement 3: uses the signed-in user's id (saved during
+      // sign-in) instead of a hardcoded constant.
+      final userId = await UserService().getCurrentUserId();
+      final cart = await _cartService.getCartByUserId(userId);
+      final cartProductIds = cart?.products.map((p) => p.id).toSet() ?? {};
+      final inCart =
+          products.where((p) => cartProductIds.contains(p.id)).toList();
       setState(() {
-        _allProducts = products;
-        _filteredProducts = products;
+        _allProducts = inCart;
+        _filteredProducts = inCart;
         _isLoading = false;
       });
     } catch (e) {

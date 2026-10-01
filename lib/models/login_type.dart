@@ -1,0 +1,1 @@
+enum LoginType { dummyJson, firebase }
